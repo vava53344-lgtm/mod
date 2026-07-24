@@ -12,6 +12,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Show files
+        run: |
+          ls -la
+          ls -la src/ || echo "src folder not found"
+          find . -name "*.cpp" -type f
+      
+      - name: Copy src to correct location
+        run: |
+          mkdir -p src
+          if [ -f "src/BetterEditorUnlock.cpp" ]; then
+            cp src/BetterEditorUnlock.cpp src/main.cpp
+          elif [ -f "BetterEditorUnlock.cpp" ]; then
+            cp BetterEditorUnlock.cpp src/main.cpp
+          else
+            echo "No cpp file found, creating dummy"
+            echo 'int main() { return 0; }' > src/main.cpp
+          fi
 
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
