@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.25)
 
 project(better-editor-unlock VERSION 1.0.0 LANGUAGES CXX)
 
+# Устанавливаем платформу Android
+if(NOT GEODE_PLATFORM)
+    set(GEODE_PLATFORM "Android64" CACHE STRING "Target platform" FORCE)
+endif()
+
 # Подключаем Geode SDK
 include(FetchContent)
 FetchContent_Declare(
