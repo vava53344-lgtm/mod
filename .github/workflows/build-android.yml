@@ -27,24 +27,21 @@ jobs:
         run: |
           echo "y" | sdkmanager --install "ndk;26.3.11579264"
 
-      - name: Setup Geode CLI
+      - name: Clone Geode SDK
         run: |
-          curl -L https://github.com/geode-sdk/cli/releases/download/v3.8.0/geode-cli-v3.8.0-linux.zip -o cli.zip
-          unzip cli.zip
-          chmod +x geode
+          git clone --depth 1 --branch v3.0.0 https://github.com/geode-sdk/sdk.git geode-sdk
 
       - name: Build Android Mod
         run: |
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/26.3.11579264
           export GEODE_SDK=$(pwd)/geode-sdk
-          git clone --depth 1 --branch v3.0.0 https://github.com/geode-sdk/sdk.git geode-sdk
           mkdir -p build
           cd build
           cmake .. -G Ninja \
             -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
             -DANDROID_ABI=arm64-v8a \
             -DANDROID_PLATFORM=android-24 \
-            -DGEODE_SDK=$(pwd)/../geode-sdk
+            -DGEODE_SDK=$GEODE_SDK
           ninja
 
       - uses: actions/upload-artifact@v4
