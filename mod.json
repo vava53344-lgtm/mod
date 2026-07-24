@@ -3,9 +3,9 @@
     "gd": {
         "android": "2.2081"
     },
-    "id": "com.vava53344.mymod",
-    "name": "My Android Mod",
-    "version": "1.0.0",
+    "id": "better-editor-unlock",
+    "name": "Better Editor Unlock",
+    "version": "1.0.1",
     "developer": "vava53344",
-    "description": "My first mobile mod for 2.2081! YA ZAEBALSYA NAHUI"
+    "description": "Unlocks editor features!"
 }
