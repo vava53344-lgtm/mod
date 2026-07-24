@@ -15,14 +15,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build Geode Mod for Android
-        uses: geode-sdk/build-geode-mod@main
-        id: build
+      - name: Setup Geode SDK
+        uses: geode-sdk/setup-geode-sdk@main
         with:
-          target: Android64
+          version: v3.0.0
+
+      - name: Build Android Mod
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a
+          make
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: better-editor-unlock-android
-          path: ${{ steps.build.outputs.build-output }}
+          path: build/*.geode
