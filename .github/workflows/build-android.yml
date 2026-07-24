@@ -1,4 +1,4 @@
-name: Build Geode Mod
+name: Build Geode Mod for Android
 
 on:
   push:
@@ -13,47 +13,39 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install dependencies
+    - name: Setup Android NDK
       run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          build-essential \
-          cmake \
-          ninja-build \
-          git \
-          wget \
-          unzip
+        cd /tmp
+        wget https://dl.google.com/android/repository/android-ndk-r25c-linux.zip
+        unzip android-ndk-r25c-linux.zip
+        sudo mv android-ndk-r25c /opt/android-ndk
+        echo "ANDROID_NDK=/opt/android-ndk" >> $GITHUB_ENV
 
-    - name: Install Geode CLI
+    - name: Download Geode CLI (musl version for Linux)
       run: |
-        # Скачиваем Geode CLI
-        wget https://github.com/geode-sdk/cli/releases/latest/download/geode-linux
-        chmod +x geode-linux
-        sudo mv geode-linux /usr/local/bin/geode
-        geode --version
+        wget https://github.com/geode-sdk/cli/releases/download/v3.8.0/geode-linux-musl
+        chmod +x geode-linux-musl
+        sudo mv geode-linux-musl /usr/local/bin/geode
 
     - name: Install Geode binaries
       run: |
-        geode sdk install-binaries Linux64
+        geode sdk install-binaries Android64
 
-    - name: Configure CMake
+    - name: Configure and build
       run: |
         mkdir -p build
         cd build
-        cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+        cmake .. \
+          -DCMAKE_TOOLCHAIN_FILE=/opt/android-ndk/build/cmake/android.toolchain.cmake \
+          -DANDROID_ABI=arm64-v8a \
+          -DANDROID_PLATFORM=android-33 \
+          -DGEODE_PLATFORM=Android64 \
+          -DCMAKE_BUILD_TYPE=Release
+        make -j$(nproc)
+        make package
 
-    - name: Build
-      run: |
-        cd build
-        ninja
-
-    - name: Package
-      run: |
-        cd build
-        ninja package
-
-    - name: Upload artifact
+    - name: Upload
       uses: actions/upload-artifact@v4
       with:
-        name: geode-mod
+        name: geode-mod-android
         path: build/*.geode
