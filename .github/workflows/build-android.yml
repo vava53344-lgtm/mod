@@ -3,8 +3,6 @@ name: Build Geode Mod
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -14,8 +12,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        submodules: recursive
 
     - name: Install dependencies
       run: |
@@ -24,38 +20,34 @@ jobs:
           build-essential \
           cmake \
           ninja-build \
-          python3 \
-          python3-pip \
           git \
-          wget
+          wget \
+          unzip
 
     - name: Install Geode CLI
       run: |
-        pip3 install geode-cli
-        # Проверяем установку
-        geode --version || echo "Geode CLI installed"
+        # Скачиваем Geode CLI
+        wget https://github.com/geode-sdk/cli/releases/latest/download/geode-linux
+        chmod +x geode-linux
+        sudo mv geode-linux /usr/local/bin/geode
+        geode --version
 
     - name: Install Geode binaries
       run: |
-        # Устанавливаем бинарные файлы для Linux
         geode sdk install-binaries Linux64
-        
-        # Или для Android (если нужно)
-        # geode sdk install-binaries Android64
 
     - name: Configure CMake
       run: |
         mkdir -p build
         cd build
-        cmake .. -G "Ninja" \
-          -DCMAKE_BUILD_TYPE=Release
+        cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
       run: |
         cd build
         ninja
 
-    - name: Package mod
+    - name: Package
       run: |
         cd build
         ninja package
