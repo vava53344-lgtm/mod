@@ -1,43 +1,67 @@
-name: Build for Android
+name: Build Geode Mod
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Show files
-        run: |
-          ls -la
-          ls -la src/ || echo "src folder not found"
-          find . -name "*.cpp" -type f
-      
-      - name: Copy src to correct location
-        run: |
-          mkdir -p src
-          if [ -f "src/BetterEditorUnlock.cpp" ]; then
-            cp src/BetterEditorUnlock.cpp src/main.cpp
-          elif [ -f "BetterEditorUnlock.cpp" ]; then
-            cp BetterEditorUnlock.cpp src/main.cpp
-          else
-            echo "No cpp file found, creating dummy"
-            echo 'int main() { return 0; }' > src/main.cpp
-          fi
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
-      - name: Build the mod
-        uses: geode-sdk/build-geode-mod@main
-        id: build
-        with:
-          target: Android64
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          ninja-build \
+          python3 \
+          python3-pip \
+          git \
+          wget
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: better-editor-unlock-android
-          path: ${{ steps.build.outputs.build-output }}
+    - name: Install Geode CLI
+      run: |
+        pip3 install geode-cli
+        # Проверяем установку
+        geode --version || echo "Geode CLI installed"
+
+    - name: Install Geode binaries
+      run: |
+        # Устанавливаем бинарные файлы для Linux
+        geode sdk install-binaries Linux64
+        
+        # Или для Android (если нужно)
+        # geode sdk install-binaries Android64
+
+    - name: Configure CMake
+      run: |
+        mkdir -p build
+        cd build
+        cmake .. -G "Ninja" \
+          -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: |
+        cd build
+        ninja
+
+    - name: Package mod
+      run: |
+        cd build
+        ninja package
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: geode-mod
+        path: build/*.geode
