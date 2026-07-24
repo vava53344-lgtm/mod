@@ -9,7 +9,7 @@ project(better-editor-unlock VERSION 1.0.0 LANGUAGES CXX)
 include(FetchContent)
 FetchContent_Declare(
     Geode
-    GIT_REPOSITORY https://github.com
+    GIT_REPOSITORY https://github.com/geode-sdk/geode.git
     GIT_TAG main
 )
 FetchContent_MakeAvailable(Geode)
