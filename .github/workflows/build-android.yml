@@ -26,16 +26,15 @@ jobs:
           unzip cli.zip
           chmod +x geode
           
-      - name: Setup Geode profile
+      - name: Setup Geode
         run: |
+          export GEODE_SDK=$(pwd)/sdk
           ./geode config setup --non-interactive
-          
-      - name: Setup Geode SDK
-        run: |
-          ./geode sdk install v3.0.0
+          ./geode sdk install v3.0.0 --path ./sdk
           
       - name: Build for Android
         run: |
+          export GEODE_SDK=$(pwd)/sdk
           ./geode build -p android -o build/
           
       - name: Upload Artifact
