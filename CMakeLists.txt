@@ -1,20 +1,23 @@
 cmake_minimum_required(VERSION 3.15)
 project(better-editor-unlock)
 
-# Ищем main.cpp во всём проекте
-file(GLOB_RECURSE SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+# Жестко указываем ТОЛЬКО папку src
+set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-# Проверяем, что нашли хоть что-то
+# Ищем файлы ТОЛЬКО в src/
+file(GLOB SRC_FILES "${SOURCE_DIR}/*.cpp")
+
+# Проверяем, есть ли хоть один файл
 if(NOT SRC_FILES)
-    message(FATAL_ERROR "No .cpp files found anywhere!")
+    message(FATAL_ERROR "No .cpp files found in ${SOURCE_DIR}")
 endif()
 
-# Выводим найденные файлы для отладки
-message(STATUS "Found source files:")
+message(STATUS "Found source files in src/:")
 foreach(FILE ${SRC_FILES})
     message(STATUS "  ${FILE}")
 endforeach()
 
+# Подключаем Geode
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(geode)
 
