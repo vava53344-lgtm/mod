@@ -1,12 +1,12 @@
 {
-  "geode": "v3.0.0",
-  "version": "v1.0.0",
+  "geode": "v5.8.2",
+  "version": "v5.8.2",
   "id": "vava53344-lgtm.better-editor-unlock",
   "name": "Better Editor Unlock",
   "developer": "vava53344-lgtm",
-  "description": "Joke: buying editor for 10B orbs",
-  "tags": ["editor", "joke", "orb"],
-  "repository": "https://github.com/vava53344-lgtm/better-editor-unlock",
+  "description": "Joke: buying editor for 10B orbs (Android)",
+  "tags": ["editor", "joke"],
+  "repository": "https://github.com/vava53344-lgtm/mod",
   "platforms": ["android"],
   "early-load": true
 }
