@@ -10,35 +10,19 @@ jobs:
   build-android:
     name: Build Android Mod
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ninja-build
-          
-      - name: Download Geode CLI
-        run: |
-          curl -L https://github.com/geode-sdk/cli/releases/download/v3.8.0/geode-cli-v3.8.0-linux.zip -o cli.zip
-          unzip cli.zip
-          chmod +x geode
-          
-      - name: Setup Geode
-        run: |
-          export GEODE_SDK=$(pwd)/sdk
-          ./geode config setup --non-interactive
-          ./geode sdk install v3.0.0 --path ./sdk
-          
-      - name: Build for Android
-        run: |
-          export GEODE_SDK=$(pwd)/sdk
-          ./geode build -p android -o build/
-          
+
+      - name: Build Geode Mod for Android
+        uses: geode-sdk/build-geode-mod@main
+        id: build
+        with:
+          target: Android64
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: better-editor-unlock-android
-          path: build/*.geode
+          path: ${{ steps.build.outputs.build-output }}
