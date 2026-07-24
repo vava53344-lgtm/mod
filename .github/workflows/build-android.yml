@@ -14,14 +14,40 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build the mod
-        uses: geode-sdk/build-geode-mod@main
-        id: build
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          target: Android64
-          combine: true
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Android NDK
+        run: |
+          echo "y" | sdkmanager --install "ndk;26.3.11579264"
+
+      - name: Setup Geode CLI
+        run: |
+          curl -L https://github.com/geode-sdk/cli/releases/download/v3.8.0/geode-cli-v3.8.0-linux.zip -o cli.zip
+          unzip cli.zip
+          chmod +x geode
+
+      - name: Build Android Mod
+        run: |
+          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/26.3.11579264
+          export GEODE_SDK=$(pwd)/geode-sdk
+          git clone --depth 1 --branch v3.0.0 https://github.com/geode-sdk/sdk.git geode-sdk
+          mkdir -p build
+          cd build
+          cmake .. -G Ninja \
+            -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
+            -DANDROID_ABI=arm64-v8a \
+            -DANDROID_PLATFORM=android-24 \
+            -DGEODE_SDK=$(pwd)/../geode-sdk
+          ninja
 
       - uses: actions/upload-artifact@v4
         with:
           name: better-editor-unlock-android
-          path: ${{ steps.build.outputs.build-output }}
+          path: build/*.geode
