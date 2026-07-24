@@ -4,10 +4,12 @@ project(better-editor-unlock)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(geode)
 
-# Указываем полный путь к файлу
-set(SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/BetterEditorUnlock.cpp
-)
+# Явно указываем файл
+file(GLOB SOURCES "src/*.cpp")
+
+if(NOT SOURCES)
+    message(FATAL_ERROR "No source files found in src/")
+endif()
 
 add_geode_mod(
     NAME better-editor-unlock
