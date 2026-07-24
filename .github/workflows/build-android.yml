@@ -7,20 +7,16 @@ on:
       - main
 
 jobs:
-  build-android:
-    name: Build Android Mod
+  build:
     runs-on: ubuntu-latest
-
+    
     steps:
       - uses: actions/checkout@v4
-
-      - name: Build the mod
+      
+      - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         id: build
-        with:
-          target: Android64
-          combine: true
-
+        
       - uses: actions/upload-artifact@v4
         with:
           name: better-editor-unlock-android
