@@ -1,0 +1,28 @@
+name: Build for Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-android:
+    name: Build Android Mod
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Build Geode Mod
+        uses: geode-sdk/build-geode-mod@main
+        id: build
+        with:
+          target: android
+          
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: better-editor-unlock-android
+          path: ${{ steps.build.outputs.build-output }}
