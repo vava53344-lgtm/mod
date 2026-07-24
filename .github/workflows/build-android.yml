@@ -24,8 +24,11 @@ jobs:
         run: |
           curl -L https://github.com/geode-sdk/cli/releases/download/v3.8.0/geode-cli-v3.8.0-linux.zip -o cli.zip
           unzip cli.zip
-          echo "$(pwd)" >> $GITHUB_PATH
           chmod +x geode
+          
+      - name: Setup Geode profile
+        run: |
+          ./geode config setup --non-interactive
           
       - name: Setup Geode SDK
         run: |
