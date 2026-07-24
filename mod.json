@@ -1,12 +1,11 @@
 {
-  "geode": "v5.8.2",
-  "version": "v5.8.2",
-  "id": "vava53344-lgtm.better-editor-unlock",
-  "name": "Better Editor Unlock",
-  "developer": "vava53344-lgtm",
-  "description": "Joke: buying editor for 10B orbs (Android)",
-  "tags": ["editor", "joke"],
-  "repository": "https://github.com/vava53344-lgtm/mod",
-  "platforms": ["android"],
-  "early-load": true
+    "geode": "5.3.0",
+    "gd": {
+        "android": "2.2081"
+    },
+    "id": "com.vava53344.mymod",
+    "name": "My Android Mod",
+    "version": "1.0.0",
+    "developer": "vava53344",
+    "description": "My first mobile mod for 2.2081! YA ZAEBALSYA NAHUI"
 }
