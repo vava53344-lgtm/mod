@@ -15,17 +15,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         
-      - name: Setup Geode CLI
-        uses: geode-sdk/setup-geode@main
+      - name: Build Geode Mod
+        uses: geode-sdk/build-geode-mod@main
+        id: build
         with:
-          sdk: v3.0.0
-          
-      - name: Build mod for Android
-        run: |
-          geode build --platform android --output build/
+          target: android
+          cli-version: v3.8.0
+          sdk-version: v3.0.0
           
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: better-editor-unlock-android
-          path: build/*.geode
+          path: ${{ steps.build.outputs.build-output }}
