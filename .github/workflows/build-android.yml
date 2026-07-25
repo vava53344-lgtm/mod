@@ -2,50 +2,24 @@ name: Build Geode Mod for Android
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Android NDK
-      run: |
-        cd /tmp
-        wget https://dl.google.com/android/repository/android-ndk-r25c-linux.zip
-        unzip android-ndk-r25c-linux.zip
-        sudo mv android-ndk-r25c /opt/android-ndk
-        echo "ANDROID_NDK=/opt/android-ndk" >> $GITHUB_ENV
+      - name: Build Geode Mod
+        uses: geode-sdk/build-geode-mod@main
+        id: build
+        with:
+          # Явно указываем цель для Android 64-bit
+          target: Android64
 
-    - name: Download Geode CLI (musl version for Linux)
-      run: |
-        wget https://github.com/geode-sdk/cli/releases/download/v3.8.0/geode-linux-musl
-        chmod +x geode-linux-musl
-        sudo mv geode-linux-musl /usr/local/bin/geode
-
-    - name: Install Geode binaries
-      run: |
-        geode sdk install-binaries Android64
-
-    - name: Configure and build
-      run: |
-        mkdir -p build
-        cd build
-        cmake .. \
-          -DCMAKE_TOOLCHAIN_FILE=/opt/android-ndk/build/cmake/android.toolchain.cmake \
-          -DANDROID_ABI=arm64-v8a \
-          -DANDROID_PLATFORM=android-33 \
-          -DGEODE_PLATFORM=Android64 \
-          -DCMAKE_BUILD_TYPE=Release
-        make -j$(nproc)
-        make package
-
-    - name: Upload
-      uses: actions/upload-artifact@v4
-      with:
-        name: geode-mod-android
-        path: build/*.geode
+      - name: Upload Mod
+        uses: actions/upload-artifact@v4
+        with:
+          name: geode-android-mod
+          path: ${{ steps.build.outputs.build-output }}
