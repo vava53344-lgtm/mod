@@ -1,26 +1,25 @@
-name: Build Geode Mod
+name: Build Geode Mod for Android
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      # Это официальный Action от разработчиков Geode!
-      # Он делает всю магию сборки за тебя.
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         id: build
         with:
-          # Явно указываем цель для Android 64-bit.
-          # На Linux-раннерах по умолчанию стоит Android64 [citation:1],
-          # но лучше указать явно для надежности.
+          # Явно указываем цель для Android 64-bit, чтобы точно установить нужные бинарники
           target: Android64
+          # Можно указать версию SDK, хотя она и так берется из mod.json
+          # sdk: v5.3.0
 
       - name: Upload Mod
         uses: actions/upload-artifact@v4
