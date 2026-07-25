@@ -12,67 +12,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Android NDK
-        run: |
-          echo "ANDROID_NDK_HOME=/usr/local/lib/android/sdk/ndk/29.0.14206865" >> $GITHUB_ENV
-          echo "ANDROID_NDK_ROOT=/usr/local/lib/android/sdk/ndk/29.0.14206865" >> $GITHUB_ENV
+      - name: Build Geode Mod
+        uses: geode-sdk/build-geode-mod@main
+        id: build
+        with:
+          target: Android64
+          sdk: v5.3.0
 
-      - name: Install Geode CLI
-        run: |
-          wget -q https://github.com/geode-sdk/cli/releases/download/v3.8.0/geode-cli-v3.8.0-linux.zip
-          unzip -q geode-cli-v3.8.0-linux.zip
-          chmod +x geode
-          sudo mv geode /usr/local/bin/
-          geode --version
-
-      - name: Setup Geode SDK (non-interactive)
-        run: |
-          # Создаем пустой профиль вручную (обходим интерактив)
-          mkdir -p ~/.local/share/geode
-          cat > ~/.local/share/geode/profile.toml << 'EOF'
-          [profile]
-          name = "default"
-          sdk_version = "v5.3.0"
-          EOF
-          
-          # Устанавливаем SDK через CLI
-          geode sdk update v5.3.0
-          
-          # Устанавливаем бинарники
-          geode sdk install-binaries -p android64
-          
-          # Сохраняем путь
-          echo "GEODE_SDK=$(geode sdk path)" >> $GITHUB_ENV
-
-      - name: Check binaries
-        run: |
-          ls -la $(geode sdk path)/binaries/Android64/ || echo "Binaries not found"
-          echo "GEODE_SDK_PATH=$(geode sdk path)"
-
-      - name: Configure CMake
-        run: |
-          mkdir -p build
-          cd build
-          cmake .. \
-            -DCMAKE_TOOLCHAIN_FILE=/usr/local/lib/android/sdk/ndk/29.0.14206865/build/cmake/android.toolchain.cmake \
-            -DANDROID_ABI=arm64-v8a \
-            -DANDROID_PLATFORM=android-31 \
-            -DGEODE_PLATFORM=Android64 \
-            -DGEODE_SDK_PATH=${{ env.GEODE_SDK }} \
-            -DCMAKE_BUILD_TYPE=Release
-
-      - name: Build
-        run: |
-          cd build
-          make -j$(nproc)
-
-      - name: Package
-        run: |
-          cd build
-          make package || echo "Package step skipped"
-
-      - name: Upload artifact
+      - name: Upload Mod
         uses: actions/upload-artifact@v4
         with:
-          name: geode-mod-android
-          path: build/*.geode
+          name: geode-android-mod
+          path: ${{ steps.build.outputs.build-output }}
