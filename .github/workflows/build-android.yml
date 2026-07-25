@@ -7,16 +7,7 @@ on:
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-          - name: Android64
-            os: ubuntu-latest
-            target: Android64
-
-    name: ${{ matrix.config.name }}
-    runs-on: ${{ matrix.config.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -25,12 +16,12 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         id: build
         with:
-          target: ${{ matrix.config.target }}
-          # Необязательно: фиксируем версию SDK для стабильности
-          # sdk: v5.3.0
+          # Для Linux раннера, если не указать target, по умолчанию стоит Android64 [citation:1][citation:3].
+          # Но лучше указать явно для надежности.
+          target: Android64
 
       - name: Upload Mod
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.config.name }}
+          name: Android64
           path: ${{ steps.build.outputs.build-output }}
