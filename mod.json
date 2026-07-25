@@ -1,11 +1,5 @@
 {
-    "geode": "5.3.0",
-    "gd": {
-        "android": "2.2081"
-    },
-    "id": "better-editor-unlock",
-    "name": "Better Editor Unlock",
-    "version": "1.0.1",
-    "developer": "vava53344",
-    "description": "Unlocks editor features!"
+    "geode": "v5.3.0",
+    "version": "1.0.0",
+    "id": "better-editor-unlock"
 }
