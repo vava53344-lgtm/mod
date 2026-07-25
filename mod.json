@@ -1,5 +1,16 @@
 {
     "geode": "v5.3.0",
+    "gd": {
+        "android": "2.208"
+    },
     "version": "1.0.0",
-    "id": "better-editor-unlock"
+    "id": "better-editor-unlock",
+    "name": "Better Editor Unlock",
+    "developer": "vava53344",
+    "description": "Unlocks editor features.",
+    "repository": "https://github.com/vava53344-lgtm/mod",
+    "links": {
+        "source": "https://github.com/vava53344-lgtm/mod"
+    },
+    "dependencies": {}
 }
