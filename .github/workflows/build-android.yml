@@ -12,17 +12,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build the mod
-        uses: geode-sdk/build-geode-mod@main
-        id: build
-        with:
-          # Явно указываем цель для Android 64-bit, чтобы точно установить нужные бинарники
-          target: Android64
-          # Можно указать версию SDK, хотя она и так берется из mod.json
-          # sdk: v5.3.0
+      # Явно устанавливаем Geode CLI и SDK
+      - name: Setup Geode
+        run: |
+          # Скачиваем и устанавливаем Geode CLI (можно взять из официального релиза)
+          wget -q https://github.com/geode-sdk/cli/releases/download/v3.8.0/geode-cli-v3.8.0-linux.zip
+          unzip -q geode-cli-v3.8.0-linux.zip
+          chmod +x geode
+          sudo mv geode /usr/local/bin/
+          
+          # Создаем профиль и устанавливаем SDK
+          mkdir -p ~/.local/share/geode
+          cat > ~/.local/share/geode/profile.toml << 'EOF'
+          [profile]
+          name = "default"
+          sdk_version = "v5.3.0"
+          EOF
+          
+          geode sdk update v5.3.0
+          
+          # === ВОТ ЭТА КОМАНДА БЫЛА ПРОПУЩЕНА ===
+          # Устанавливаем бинарники для Android 64-bit
+          geode sdk install-binaries -p android64
+          
+          echo "GEODE_SDK=$(geode sdk path)" >> $GITHUB_ENV
 
-      - name: Upload Mod
+      - name: Build
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. \
+            -DCMAKE_TOOLCHAIN_FILE=/usr/local/lib/android/sdk/ndk/29.0.14206865/build/cmake/android.toolchain.cmake \
+            -DANDROID_ABI=arm64-v8a \
+            -DANDROID_PLATFORM=android-31 \
+            -DGEODE_PLATFORM=Android64 \
+            -DCMAKE_BUILD_TYPE=Release
+          make -j$(nproc)
+          make package
+
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: Android64 Mod
-          path: ${{ steps.build.outputs.build-output }}
+          name: geode-android-mod
+          path: build/*.geode
