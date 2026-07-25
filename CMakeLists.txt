@@ -1,22 +1,12 @@
-cmake_minimum_required(VERSION 3.25)
-
+cmake_minimum_required(VERSION 3.20)
 project(better-editor-unlock VERSION 1.0.0 LANGUAGES CXX)
 
-# Указываем платформу
-if(NOT GEODE_PLATFORM)
-    set(GEODE_PLATFORM "Android64" CACHE STRING "Target platform" FORCE)
-endif()
-
-# Если передан путь к SDK через переменную окружения
-if(DEFINED ENV{GEODE_SDK})
-    set(GEODE_SDK_PATH $ENV{GEODE_SDK} CACHE PATH "Path to Geode SDK")
-endif()
-
+# Это все, что нужно! Action сам подставит нужные пути к SDK.
 include(FetchContent)
 FetchContent_Declare(
     Geode
     GIT_REPOSITORY https://github.com/geode-sdk/geode.git
-    GIT_TAG v5.3.0
+    GIT_TAG main
 )
 FetchContent_MakeAvailable(Geode)
 
