@@ -8,42 +8,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: 
+      image: ghcr.io/geode-sdk/build-android:latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Geode Mod (prep)
-        uses: geode-sdk/build-geode-mod@main
-        id: build
-        with:
-          target: Android64
-          sdk: v5.3.0
-
-      - name: Fix binaries manually
+      - name: Build
         run: |
-          # Переходим в папку с SDK
-          cd /home/runner/.local/share/geode/sdk
-          
-          # Скачиваем бинарники напрямую с GitHub релизов
-          wget -q https://github.com/geode-sdk/binaries/releases/download/v5.3.0/Android64.zip
-          unzip -q Android64.zip -d binaries/
-          rm Android64.zip
-          
-          # Проверяем что скачалось
-          ls -la binaries/Android64/
-          
-          # Пересобираем с правильным путём
-          cd /home/runner/work/mod/mod/build
-          rm -rf *
-          cmake .. \
-            -DCMAKE_TOOLCHAIN_FILE=/usr/local/lib/android/sdk/ndk/29.0.14206865/build/cmake/android.toolchain.cmake \
-            -DANDROID_ABI=arm64-v8a \
-            -DANDROID_PLATFORM=android-31 \
-            -DGEODE_PLATFORM=Android64 \
-            -DGEODE_SDK_PATH=/home/runner/.local/share/geode/sdk \
-            -DGEODE_BINARY_DIR=/home/runner/.local/share/geode/sdk/binaries/Android64 \
-            -DCMAKE_BUILD_TYPE=Release
-          
+          mkdir -p build && cd build
+          cmake .. -DGEODE_PLATFORM=Android64 -DCMAKE_BUILD_TYPE=Release
           make -j$(nproc)
           make package
 
