@@ -15,11 +15,12 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         id: build
         with:
-          # Явно указываем цель для Android 64-bit
           target: Android64
+          sdk-version: v5.3.0  # ← Явно указываем версию
 
       - name: Upload Mod
         uses: actions/upload-artifact@v4
         with:
           name: geode-android-mod
           path: ${{ steps.build.outputs.build-output }}
+  
