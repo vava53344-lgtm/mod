@@ -25,11 +25,23 @@ jobs:
           sudo mv geode /usr/local/bin/
           geode --version
 
-      - name: Setup Geode SDK
+      - name: Setup Geode SDK (non-interactive)
         run: |
-          geode config setup
+          # Создаем пустой профиль вручную (обходим интерактив)
+          mkdir -p ~/.local/share/geode
+          cat > ~/.local/share/geode/profile.toml << 'EOF'
+          [profile]
+          name = "default"
+          sdk_version = "v5.3.0"
+          EOF
+          
+          # Устанавливаем SDK через CLI
           geode sdk update v5.3.0
+          
+          # Устанавливаем бинарники
           geode sdk install-binaries -p android64
+          
+          # Сохраняем путь
           echo "GEODE_SDK=$(geode sdk path)" >> $GITHUB_ENV
 
       - name: Check binaries
