@@ -8,20 +8,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
+      # Это официальный Action от разработчиков Geode!
+      # Он делает всю магию сборки за тебя.
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         id: build
         with:
-          # Для Linux раннера, если не указать target, по умолчанию стоит Android64 [citation:1][citation:3].
-          # Но лучше указать явно для надежности.
+          # Явно указываем цель для Android 64-bit.
+          # На Linux-раннерах по умолчанию стоит Android64 [citation:1],
+          # но лучше указать явно для надежности.
           target: Android64
 
       - name: Upload Mod
         uses: actions/upload-artifact@v4
         with:
-          name: Android64
+          name: Android64 Mod
           path: ${{ steps.build.outputs.build-output }}
