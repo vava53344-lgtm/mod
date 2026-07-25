@@ -8,15 +8,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
 
+      # Устанавливаем Android NDK (это критично для Android сборки)
       - name: Setup Android NDK
         run: |
           echo "ANDROID_NDK_HOME=/usr/local/lib/android/sdk/ndk/29.0.14206865" >> $GITHUB_ENV
           echo "ANDROID_NDK_ROOT=/usr/local/lib/android/sdk/ndk/29.0.14206865" >> $GITHUB_ENV
 
+      # Устанавливаем Geode CLI (как и раньше)
       - name: Install Geode CLI
         run: |
           wget -q https://github.com/geode-sdk/cli/releases/download/v3.8.0/geode-cli-v3.8.0-linux.zip
@@ -25,19 +27,25 @@ jobs:
           sudo mv geode /usr/local/bin/
           geode --version
 
+      # Инициализируем профиль и устанавливаем бинарники ПРАВИЛЬНО
       - name: Setup Geode SDK
         run: |
-          geode profile create builder --sdk-version v5.3.0
-          geode profile use builder
-          geode sdk install-binaries Android64
+          # Используем правильную команду config setup
+          geode config setup --sdk-version v5.3.0
+          
+          # Теперь устанавливаем бинарники для Android64
+          geode sdk install-binaries -p android64
+          
+          # Сохраняем путь к SDK для следующих шагов
           echo "GEODE_SDK=$(geode sdk path)" >> $GITHUB_ENV
-          echo "GEODE_CLI=$(which geode)" >> $GITHUB_ENV
 
+      # Проверяем, что бинарники действительно установились
       - name: Check binaries
         run: |
           ls -la $(geode sdk path)/binaries/Android64/ || echo "Binaries not found"
           echo "GEODE_SDK_PATH=$(geode sdk path)"
 
+      # Конфигурируем CMake для Android
       - name: Configure CMake
         run: |
           mkdir -p build
@@ -50,16 +58,19 @@ jobs:
             -DGEODE_SDK_PATH=${{ env.GEODE_SDK }} \
             -DCMAKE_BUILD_TYPE=Release
 
+      # Запускаем сборку
       - name: Build
         run: |
           cd build
           make -j$(nproc)
 
+      # Пытаемся создать .geode пакет
       - name: Package
         run: |
           cd build
           make package || echo "Package step skipped"
 
+      # Загружаем готовый файл как артефакт
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
